@@ -1,0 +1,63 @@
+class VacuumCleaner:
+    def __init__(self, location, room_a, room_b):
+        self.location = location
+        self.room_a = room_a
+        self.room_b = room_b
+
+    def display_state(self):
+        print(
+            f"Vacuum: {self.location}, "
+            f"Room A: {self.room_a}, "
+            f"Room B: {self.room_b}"
+        )
+
+    def is_goal_reached(self):
+        return self.room_a == "Clean" and self.room_b == "Clean"
+
+    def suck(self):
+        if self.location == "A" and self.room_a == "Dirty":
+            print("Action: SUCK")
+            self.room_a = "Clean"
+
+        elif self.location == "B" and self.room_b == "Dirty":
+            print("Action: SUCK")
+            self.room_b = "Clean"
+
+    def move_right(self):
+        if self.location == "A":
+            print("Action: MOVE RIGHT")
+            self.location = "B"
+
+    def move_left(self):
+        if self.location == "B":
+            print("Action: MOVE LEFT")
+            self.location = "A"
+
+    def run(self):
+        while not self.is_goal_reached():
+
+            self.display_state()
+
+            if self.location == "A" and self.room_a == "Dirty":
+                self.suck()
+
+            elif self.location == "B" and self.room_b == "Dirty":
+                self.suck()
+
+            elif self.location == "A" and self.room_b == "Dirty":
+                self.move_right()
+
+            elif self.location == "B" and self.room_a == "Dirty":
+                self.move_left()
+
+        print("\nGoal reached!")
+        self.display_state()
+
+
+vacuum = VacuumCleaner(
+    location="A",
+    room_a="Dirty",
+    room_b="Dirty"
+)
+
+vacuum.run()
