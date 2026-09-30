@@ -1,0 +1,133 @@
+def print_board(state):
+    for i in range(0, 9, 3):
+        print(state[i:i+3])
+    print()
+
+
+def get_neighbors(state):
+
+    neighbors = []
+
+    zero = state.index('0')
+
+    row = zero // 3
+    col = zero % 3
+
+    moves = [
+        (-1, 0, "Up"),
+        (1, 0, "Down"),
+        (0, -1, "Left"),
+        (0, 1, "Right")
+    ]
+
+    for dr, dc, move in moves:
+
+        new_row = row + dr
+        new_col = col + dc
+
+        if 0 <= new_row < 3 and 0 <= new_col < 3:
+
+            new_zero = new_row * 3 + new_col
+
+            board = list(state)
+
+            board[zero], board[new_zero] = \
+                board[new_zero], board[zero]
+
+            new_state = ''.join(board)
+
+            neighbors.append((new_state, move))
+
+    return neighbors
+
+
+def depth_limited_search(
+    state,
+    goal,
+    depth,
+    limit,
+    path,
+    path_states
+):
+
+    # Goal reached
+    if state == goal:
+        return True
+
+    # Depth limit reached
+    if depth == limit:
+        return False
+
+    for new_state, move in get_neighbors(state):
+
+        # Don't create a cycle
+        if new_state in path_states:
+            continue
+
+        # Make move
+        path.append(move)
+        path_states.add(new_state)
+
+        # Recursive DFS
+        found = depth_limited_search(
+            new_state,
+            goal,
+            depth + 1,
+            limit,
+            path,
+            path_states
+        )
+
+        if found:
+            return True
+
+        # Backtrack
+        path.pop()
+        path_states.remove(new_state)
+
+    return False
+
+
+def iterative_deepening_search(initial, goal):
+
+    limit = 0
+
+    while True:
+
+        print("Depth limit:", limit)
+
+        path = []
+
+        path_states = {initial}
+
+        found = depth_limited_search(
+            initial,
+            goal,
+            0,
+            limit,
+            path,
+            path_states
+        )
+
+        if found:
+            return path
+
+        limit += 1
+
+
+# -------------------------
+# Main
+# -------------------------
+
+initial = "123406758"
+goal = "123456780"
+
+solution = iterative_deepening_search(
+    initial,
+    goal
+)
+
+print("\nSolution:")
+print(" -> ".join(solution))
+
+print("\nNumber of moves:", len(solution))
