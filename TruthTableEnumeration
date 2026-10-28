@@ -1,0 +1,117 @@
+# Truth Table Enumeration for Propositional Entailment
+
+# Implication: P -> Q
+def implies(P, Q):
+    return (not P) or Q
+
+
+# Knowledge Base:
+# KB = (Q -> P) AND (P -> ~Q) AND (Q OR R)
+def evaluate_KB(P, Q, R):
+    q_implies_p = implies(Q, P)
+    p_implies_not_q = implies(P, not Q)
+    q_or_r = Q or R
+
+    return q_implies_p and p_implies_not_q and q_or_r
+
+
+# Queries
+def query_R(P, Q, R):
+    return R
+
+
+def query_R_implies_P(P, Q, R):
+    return implies(R, P)
+
+
+def query_Q_implies_R(P, Q, R):
+    return implies(Q, R)
+
+
+# Generate Truth Table
+print("TRUTH TABLE")
+print("=" * 80)
+
+print("P  Q  R | Q->P | P->~Q | Q|R |  KB  |   R   | R->P | Q->R")
+print("-" * 80)
+
+models = []
+
+for P in [False, True]:
+    for Q in [False, True]:
+        for R in [False, True]:
+
+            # Evaluate individual KB sentences
+            q_p = implies(Q, P)
+            p_not_q = implies(P, not Q)
+            q_or_r = Q or R
+
+            # Evaluate complete KB
+            KB = evaluate_KB(P, Q, R)
+
+            # Evaluate queries
+            query1 = query_R(P, Q, R)
+            query2 = query_R_implies_P(P, Q, R)
+            query3 = query_Q_implies_R(P, Q, R)
+
+            # Store model
+            models.append((P, Q, R, KB, query1, query2, query3))
+
+            # Print row
+            print(
+                f"{int(P)}  {int(Q)}  {int(R)} |  "
+                f"{int(q_p)}    |   "
+                f"{int(p_not_q)}    |  "
+                f"{int(q_or_r)}  |  "
+                f"{int(KB)}   |  "
+                f"{int(query1)}   |  "
+                f"{int(query2)}   |  "
+                f"{int(query3)}"
+            )
+
+
+# Check entailment
+print("\n" + "=" * 80)
+print("ENTAILMENT RESULTS")
+print("=" * 80)
+
+
+def check_entailment(query_index):
+    for model in models:
+
+        P, Q, R, KB, query1, query2, query3 = model
+
+        if query_index == 1:
+            query = query1
+        elif query_index == 2:
+            query = query2
+        else:
+            query = query3
+
+        # Counterexample:
+        # KB is TRUE but query is FALSE
+        if KB and not query:
+            return False
+
+    return True
+
+
+# Query 1: R
+if check_entailment(1):
+    print("KB entails R          : YES")
+else:
+    print("KB entails R          : NO")
+
+
+# Query 2: R -> P
+if check_entailment(2):
+    print("KB entails R -> P     : YES")
+else:
+    print("KB entails R -> P     : NO")
+
+
+# Query 3: Q -> R
+if check_entailment(3):
+    print("KB entails Q -> R     : YES")
+else:
+    print("KB entails Q -> R     : NO")

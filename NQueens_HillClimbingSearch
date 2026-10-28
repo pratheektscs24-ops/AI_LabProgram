@@ -1,0 +1,110 @@
+# Hill Climbing Algorithm for 4-Queens Problem
+
+# Calculate cost of a state
+# Cost = number of pairs of queens attacking each other
+def calculate_cost(state):
+    cost = 0
+    n = len(state)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+
+            # Same row
+            if state[i] == state[j]:
+                cost += 1
+
+            # Same diagonal
+            elif abs(state[i] - state[j]) == abs(i - j):
+                cost += 1
+
+    return cost
+
+
+# Generate all neighbors by swapping two queens
+def generate_neighbors(state):
+    neighbors = []
+
+    n = len(state)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+
+            neighbor = state.copy()
+
+            # Swap two queens
+            neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
+
+            cost = calculate_cost(neighbor)
+
+            neighbors.append((cost, i, j, neighbor))
+
+    return neighbors
+
+
+# Hill Climbing Algorithm
+def hill_climbing(initial_state):
+
+    current = initial_state.copy()
+
+    while True:
+
+        current_cost = calculate_cost(current)
+
+        print("\nCurrent State:", current)
+        print("Current Cost:", current_cost)
+
+        # Goal state
+        if current_cost == 0:
+            print("Goal state reached!")
+            return current
+
+        # Generate all neighbors
+        neighbors = generate_neighbors(current)
+
+        print("\nNeighbors:")
+
+        for cost, i, j, neighbor in neighbors:
+            print("Swap x{} and x{} -> {}  Cost = {}".format(
+                i, j, neighbor, cost
+            ))
+
+        # Find minimum cost
+        min_cost = min(neighbor[0] for neighbor in neighbors)
+
+        # Select neighbors having minimum cost
+        best_neighbors = [
+            neighbor for neighbor in neighbors
+            if neighbor[0] == min_cost
+        ]
+
+        # Tie-breaking:
+        # Select the neighbor with the smallest first subscript
+        # and then smallest second subscript
+        best_neighbors.sort(key=lambda x: (x[1], x[2]))
+
+        best = best_neighbors[0]
+
+        best_cost, i, j, best_state = best
+
+        print("\nSelected Neighbor:")
+        print("Swap x{} and x{} -> {}".format(i, j, best_state))
+        print("Cost =", best_cost)
+
+        # If no improvement, stop
+        if best_cost >= current_cost:
+            print("\nNo better neighbor found.")
+            print("Hill climbing terminated.")
+            return current
+
+        # Move to the better neighbor
+        current = best_state
+
+
+# Initial state given in the Week-4 PPT
+initial_state = [3, 1, 2, 0]
+
+# Run Hill Climbing
+solution = hill_climbing(initial_state)
+
+print("\nFinal Solution:", solution)
+print("Final Cost:", calculate_cost(solution))
