@@ -1,0 +1,48 @@
+
+def alpha_beta(node, alpha, beta, maximizing):
+    if not isinstance(node, list):
+        return node
+
+    if maximizing:
+        value = float('-inf')
+
+        for i, child in enumerate(node):
+            result = alpha_beta(child, alpha, beta, False)
+            value = max(value, result)
+            alpha = max(alpha, value)
+
+            if alpha >= beta:
+                print("Pruned:", node[i+1:])
+                break
+
+        return value
+
+    else:
+        value = float('inf')
+
+        for i, child in enumerate(node):
+            result = alpha_beta(child, alpha, beta, True)
+            value = min(value, result)
+            beta = min(beta, value)
+
+            if alpha >= beta:
+                print("Pruned:", node[i+1:])
+                break
+
+        return value
+
+
+# Game tree
+tree = [
+    [[10, 9], [14, 18]],
+    [[5, 4], [50, 3]]
+]
+
+# Initial values
+alpha = float('-inf')
+beta = float('inf')
+
+# Find optimal value
+result = alpha_beta(tree, alpha, beta, True)
+
+print("Optimal value of MAX node:", result)

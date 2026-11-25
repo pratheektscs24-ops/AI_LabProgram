@@ -1,0 +1,77 @@
+
+import random
+import math
+
+# Calculate the number of attacking queen pairs
+def calculate_cost(state):
+    conflicts = 0
+
+    for i in range(8):
+        for j in range(i + 1, 8):
+
+            # Same row or same diagonal
+            if state[i] == state[j] or abs(state[i] - state[j]) == abs(i - j):
+                conflicts += 1
+
+    return conflicts
+
+
+# Generate a random neighbouring state
+def get_neighbor(state):
+    next_state = state.copy()
+
+    col = random.randint(0, 7)
+    new_row = random.randint(1, 8)
+
+    next_state[col] = new_row
+
+    return next_state
+
+
+# Simulated Annealing algorithm
+def simulated_annealing():
+
+    current = [random.randint(1, 8) for i in range(8)]
+    best = current.copy()
+
+    T = 100
+    cooling_rate = 0.99
+
+    while T > 0.01:
+
+        if calculate_cost(best) == 0:
+            break
+
+        next_state = get_neighbor(current)
+
+        delta_E = calculate_cost(current) - calculate_cost(next_state)
+
+        if delta_E > 0:
+            current = next_state
+
+        else:
+            probability = math.exp(delta_E / T)
+
+            if random.random() < probability:
+                current = next_state
+
+        # Update best solution
+        if calculate_cost(current) < calculate_cost(best):
+            best = current.copy()
+
+        # Decrease temperature
+        T = T * cooling_rate
+
+    return best
+
+
+# Main program
+solution = simulated_annealing()
+
+print("Final Board:", solution)
+print("Number of conflicts:", calculate_cost(solution))
+
+if calculate_cost(solution) == 0:
+    print("Solution Found!")
+else:
+    print("Solution not found. Try running again.")
